@@ -32,5 +32,6 @@ Variables:
 If you run into any issues while setting up the integration, reach out to Optimizely via a [Support ticket](https://help.optimizely.com/Account_Settings/File_online_tickets_for_support).
 
 ## Credits
-[Spencer Smitherman](https://gist.github.com/Bigspencey) is the autor of the original 11-step process and the v1.0 of integration code
+[Spencer Smitherman](https://gist.github.com/Bigspencey) is the autor of the original 11-step process and the v1.0 of integration code.
+
 [Nebo Agency](www.neboagency.com) first came up with the idea of using the _Import Container_ functionality to simplify the process.
