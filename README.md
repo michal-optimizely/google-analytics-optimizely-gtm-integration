@@ -9,7 +9,7 @@ Supporting files for setting up the integration between Optimizely and Google An
 ## Instructions when using the JSON file
 1) Download the JSON file
 2) Upload it to GTM using _Admin > Import Container_
-3) Update `Optimizely Campaign Decided` & `Optimizely Referrer Override` with your own Google Analytics Setting Variable (or use the override option to specify the GA Tracking ID)
+3) Update `Optimizely Campaign Decided` & `Optimizely Referrer Override` tags with your own Google Analytics Setting Variable (or use the override option to specify the GA Tracking ID)
 4) Publish the workspace
 
 ## Properties created in GTM via this import
