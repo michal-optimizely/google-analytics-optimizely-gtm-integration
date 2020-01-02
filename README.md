@@ -1,20 +1,22 @@
 # Optimizely & Google Analytics via GTM analytics integration
 
-Supporting files for setting up the integration between Optimizely and Google Analytics when done via Google Tag Manager. For a detailed overview of the integration setup refer to [Optimizely's documentation](https://help.optimizely.com/Integrate_Other_Platforms/Integrate_Optimizely_X_with_Google_Universal_Analytics_using_Google_Tag_Manager).
+Supporting files for setting up the integration between Optimizely and Google Analytics when GA is implemented via Google Tag Manager. For a detailed overview of the integration setup refer to [Optimizely's documentation](https://help.optimizely.com/Integrate_Other_Platforms/Integrate_Optimizely_X_with_Google_Universal_Analytics_using_Google_Tag_Manager).
 
 ## Content
-- *Optimizely Integration Code* (html/js): code used inside the custom HTML Tag named "Optimizely Integration Code".
-- *GTM Import Container* (json): JSON file that you can import to GTM to create all the necessary Tags, Triggers and Variables used by this integration.
+- *Optimizely Integration Code* (html/js): code used inside the custom HTML Tag named "Optimizely Integration Code". Included here only for reference purposes.
+- *GTM Import Container* (json): a JSON file that you can import into GTM. It includes all the necessary Tags, Triggers and Variables used by this integration.
 
 ## Instructions when using the JSON file
-1) Download the JSON file.
-2) Upload it to your GTM using _Admin > Import Container_. Use the *Merge* import option to avoid overwriting and/or deleting any existing properties. If you're updating the integration from previous version, select the option to 'Overwrite conflicting tags, triggers and variables.' (Note this won't fully work if updating from version 1.0 due to some discrepancies in the names of individual properties; you will need to manually delete the old properties in that case.)
+1) Download the *gtm-import-container.json* file.
+2) Upload it to your GTM using _Admin > Import Container_. Use the *Merge* import option to avoid overwriting and/or deleting any existing properties. 
+   If you're updating the integration from previous version, select the option to 'Overwrite conflicting tags, triggers and variables.' (Note this won't fully work if updating from version 1.0 due to some discrepancies in the names of individual properties; you will need to manually delete the old properties in that case.)
 3) `Optimizely Campaign Decided` & `Optimizely Referrer Override` tags need to be updated to know what GA tracking ID they should be using. 
-[repeat this for both tags] Open the tag settings find the **Google Analytics Settings** field. You have two options:
-  - You can use the [Google Analytics Setting Variable] (https://support.google.com/tagmanager/answer/9207621?hl=en). This variable needs to be created manually and populated with the GA tracking ID, it's not provided by default. 
+   [repeat this for both tags] Open the tag settings and find the **Google Analytics Settings** field. You have two options:
+  * You can use the [Google Analytics Setting Variable](https://support.google.com/tagmanager/answer/9207621?hl=en). This variable needs to be created manually and populated with the GA tracking ID, it's not provided by default. 
   If you select this option, make sure to leave the **Tracking ID* field right below the *Enable overriding settings in this tag* option empty.
-  - If you don't have/don't want to use the Google Analytics Setting Variable, keep the *Enable overriding settings in this tag* option checked and enter your own GA tracking ID in the **Tracking ID** field right below (it will be pre-populated with value 'UA-136103615-1' - this is not correct and needs to be overwritten with your own tracking ID).
-4) Publish the workspace.
+  * If you don't have/don't want to use the Google Analytics Setting Variable, keep the *Enable overriding settings in this tag* option checked and enter your own GA tracking ID in the **Tracking ID** field right below (it will be pre-populated with a value 'UA-000000-0' - this is not correct and needs to be overwritten with your own GA tracking ID).
+4) Publish the workspace. 
+5) In Optimizely, enable the Google Analytics integration for any experiment you want to analyze in GA.
 
 ## Properties created in GTM via this import
 
