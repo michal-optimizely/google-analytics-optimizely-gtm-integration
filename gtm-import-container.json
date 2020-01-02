@@ -1,13 +1,13 @@
 {
     "exportFormatVersion": 2,
-    "exportTime": "2019-03-14 12:40:16",
+    "exportTime": "2020-01-02 12:31:46",
     "containerVersion": {
-        "path": "accounts/925787450/containers/6045411/versions/0",
+        "path": "accounts/925787450/containers/6045411/versions/5",
         "accountId": "925787450",
         "containerId": "6045411",
-        "containerVersionId": "0",
+        "containerVersionId": "5",
         "name": "Optimizely-Google Analytics Integration via GTM",
-        "description": "Adds variables, tags and triggers necessary for Optimizely-Google Analytics Integration through Google Tag Manger as documented here:\nhttps://help.optimizely.com/Integrate_Other_Platforms/Integrate_Optimizely_X_with_Google_Universal_Analytics_using_Google_Tag_Manager",
+        "description": "Version 2.1. Adds variables, tags, and triggers necessary for Optimizely-Google Analytics Integration through Google Tag Manager as documented here: https://help.optimizely.com/Integrate_Other_Platforms/Integrate_Optimizely_X_with_Google_Universal_Analytics_using_Google_Tag_Manager",
         "container": {
             "path": "accounts/925787450/containers/6045411",
             "accountId": "925787450",
@@ -17,7 +17,7 @@
             "usageContext": [
                 "WEB"
             ],
-            "fingerprint": "1552567167828",
+            "fingerprint": "1552660878358",
             "tagManagerUrl": "https://tagmanager.google.com/#/container/accounts/925787450/containers/6045411/workspaces?apiLink=container"
         },
         "tag": [
@@ -50,11 +50,6 @@
                     },
                     {
                         "type": "TEMPLATE",
-                        "key": "gaSettings",
-                        "value": "{{Flexbox Playground}}"
-                    },
-                    {
-                        "type": "TEMPLATE",
                         "key": "eventAction",
                         "value": "Assigned to Campaign"
                     },
@@ -78,13 +73,21 @@
                                 ]
                             }
                         ]
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "trackingId",
+                        "value": "UA-000000-0"
                     }
                 ],
-                "fingerprint": "1552388439516",
+                "fingerprint": "1577966358653",
                 "firingTriggerId": [
                     "8"
                 ],
-                "tagFiringOption": "ONCE_PER_EVENT"
+                "tagFiringOption": "ONCE_PER_EVENT",
+                "monitoringMetadata": {
+                    "type": "MAP"
+                }
             },
             {
                 "accountId": "925787450",
@@ -96,7 +99,7 @@
                     {
                         "type": "TEMPLATE",
                         "key": "html",
-                        "value": "<script>\nvar DATALAYER_OBJECT_NAME = 'dataLayer';\n\n/**\n* Some analytics platforms have the ability to fix referrer values by overriding the page referrer value.\n* this function is called when a redirect has occured on the previous page.\n*\n* @param {string} referrer - The effective referrer value\n*/\nvar referrerOverride = function(referrer) {\n    var dataLayerObject = window[DATALAYER_OBJECT_NAME] || [];\n    dataLayerObject.push({\n      'event': 'optimizely-referrer-override',\n      'optimizely-referrer': referrer\n    });\n};\n\n/**\n* Used for experiments created in Optimizely. This function is executed for all\n* experiments that are running on the page. Use the arguments to send data to your platform.\n*\n* @param {string} campaignId - The ID of a campaign that is running on the page\n* @param {string} integrationString - Integration string for a particular campaign\n*   which is a sample of the visitor that isn't exposed so that Optimizely can calculate the impact of a campaign.\n*/\nvar sendCampaignData = function(campaignId, integrationString) {\n  var dimension = optimizely.get('data') && optimizely.get('data').campaigns[campaignId] && optimizely.get('data').campaigns[campaignId].integrationSettings && optimizely.get('data').campaigns[campaignId].integrationSettings.google_universal_analytics && optimizely.get('data').campaigns[campaignId].integrationSettings.google_universal_analytics.universal_analytics_slot;\n  console.log('DIMENSION: ' + dimension);\n  if (dimension) {\n    console.log('DIMENSION FOUND!')\n    var customVariableValue = integrationString;\n    console.log('custom variable value: ' + customVariableValue);\n    var dataLayerObject = window[DATALAYER_OBJECT_NAME] || [];\n    dataLayerObject.push({\n      'event': 'campaign-decided',\n      'optimizely-dimension-value': customVariableValue,\n      'optimizely-dimension-number': dimension\n    });\n  }\n};\n\n/**\n* This function fetches the campaign integration string from the Optimizely client\n* and calls the functions provided in the arguments with the data that needs to\n* be used for sending information. It is recommended to leave this function as is\n* and to create your own implementation of the functions referrerOverride and\n* sendCampaignData.\n*\n* @param {Function} referrerOverride - This function is called if the effective referrer value differs from\n*   the current document.referrer value. The only argument provided is the effective referrer value.\n* @param {Function} sendCampaignData - This function is called for every running campaign on the page.\n*   The function is called with all the relevant ids and names.\n*/\nvar initNewOptimizelyIntegration = function(referrerOverride, sendCampaignData) {\n  // There can only be one effective referrer on a page. This boolean makes sure the\n  // redirect overwrite only happens once. Multiple referrerOverwrites might result in undesired behavior.\n  var referrerOverwritten = false;\n  var newActiveCampaign = function(id) {\n    var state = window['optimizely'].get && window['optimizely'].get('state');\n    var referrer = state.getRedirectInfo() && state.getRedirectInfo().referrer;\n    if (!referrerOverwritten && referrer) {\n      referrerOverride(referrer);\n      referrerOverwritten = true;\n    }\n\n    var campaignId = id;\n    var integrationString = state.getDecisionString({'campaignId':campaignId});\n\n    sendCampaignData(campaignId, integrationString);\n    console.log('integration string from within the newActiveCampaign function: ' + integrationString);\n  };\n  \n  /**\n   * At any moment, a new campaign can be activated (manual or conditional activation).\n   * This function registers a listener that listens to newly activated campaigns and\n   * handles them.\n   */\n  var registerFutureActiveCampaigns = function() {\n    window.optimizely = window.optimizely || [];\n    window.optimizely.push({\n      type: 'addListener',\n      filter: {\n        type: 'lifecycle',\n        name: 'campaignDecided'\n      },\n      handler: function(event) {\n        var id = event.data.campaign.id;\n        newActiveCampaign(id);\n      }\n    });\n  };\n  \n  /**\n   * If this code is running after Optimizely on the page, there might already be\n   * some campaigns active. This function makes sure all those campaigns are\n   * handled.\n   */\n  var registerCurrentlyActiveCampaigns = function(){\n    var state = window['optimizely'] && window['optimizely'].get && window['optimizely'].get('state');\n    if (state) {\n      var activeCampaigns = state.getCampaignStates({\n        isActive: true\n      });\n      console.table(activeCampaigns)\n      for (var id in activeCampaigns) {\n        newActiveCampaign(id);\n      }\n    }\n  };\n  \n  registerCurrentlyActiveCampaigns();\n  registerFutureActiveCampaigns();\n};\n\n/**\n* A wrapper around the logic for the new Optimizely integration.\n* @param {Function} referrerOverride - This function is called if the effective referrer value differs from\n*   the current document.referrer value. The only argument provided is the effective referrer value.\n* @param {Function} sendCampaignData - This function is called for every running campaign on the page.\n*   The function is called with all the relevant ids and names.\n*/\nvar initOptimizelyIntegration = function(referrerOverride, sendCampaignData) {\n  initNewOptimizelyIntegration(referrerOverride, sendCampaignData);\n}\n\ninitOptimizelyIntegration(referrerOverride, sendCampaignData);\n</script>"
+                        "value": "<script>\nvar DATALAYER_OBJECT_NAME = 'dataLayer';\n\n/**\n* Some analytics platforms have the ability to fix referrer values by overriding the page referrer value.\n* this function is called when a redirect has occured on the previous page.\n*\n* @param {string} referrer - The effective referrer value\n*/\nvar referrerOverride = function(referrer) {\n    var dataLayerObject = window[DATALAYER_OBJECT_NAME] || [];\n    dataLayerObject.push({\n      'event': 'optimizely-referrer-override',\n      'optimizely-referrer': referrer\n    });\n};\n\n/**\n* Used for experiments created in Optimizely. This function is executed for all\n* experiments that are running on the page. Use the arguments to send data to your platform.\n*\n* @param {string} campaignId - The ID of a campaign that is running on the page\n* @param {string} integrationString - Integration string for a particular campaign\n*   which is a sample of the visitor that isn't exposed so that Optimizely can calculate the impact of a campaign.\n*/\nvar sendCampaignData = function(campaignId, integrationString) {\n  var dimension = optimizely.get('data') && optimizely.get('data').campaigns[campaignId] && optimizely.get('data').campaigns[campaignId].integrationSettings && optimizely.get('data').campaigns[campaignId].integrationSettings.google_universal_analytics && optimizely.get('data').campaigns[campaignId].integrationSettings.google_universal_analytics.universal_analytics_slot;\n  if (dimension) {\n    var customVariableValue = integrationString;\n    var dataLayerObject = window[DATALAYER_OBJECT_NAME] || [];\n    dataLayerObject.push({\n      'event': 'campaign-decided',\n      'optimizely-dimension-value': customVariableValue,\n      'optimizely-dimension-number': dimension\n    });\n  }\n};\n\n/**\n* This function fetches the campaign integration string from the Optimizely client\n* and calls the functions provided in the arguments with the data that needs to\n* be used for sending information. It is recommended to leave this function as is\n* and to create your own implementation of the functions referrerOverride and\n* sendCampaignData.\n*\n* @param {Function} referrerOverride - This function is called if the effective referrer value differs from\n*   the current document.referrer value. The only argument provided is the effective referrer value.\n* @param {Function} sendCampaignData - This function is called for every running campaign on the page.\n*   The function is called with all the relevant ids and names.\n*/\nvar initNewOptimizelyIntegration = function(referrerOverride, sendCampaignData) {\n  // There can only be one effective referrer on a page. This boolean makes sure the\n  // redirect overwrite only happens once. Multiple referrerOverwrites might result in undesired behavior.\n  var referrerOverwritten = false;\n  var newActiveCampaign = function(id) {\n    var state = window['optimizely'].get && window['optimizely'].get('state');\n    var referrer = state.getRedirectInfo() && state.getRedirectInfo().referrer;\n    if (!referrerOverwritten && referrer) {\n      referrerOverride(referrer);\n      referrerOverwritten = true;\n    }\n\n    var campaignId = id;\n    var integrationString = state.getDecisionString({'campaignId':campaignId});\n\n    sendCampaignData(campaignId, integrationString);\n  };\n  \n  /**\n   * At any moment, a new campaign can be activated (manual or conditional activation).\n   * This function registers a listener that listens to newly activated campaigns and\n   * handles them.\n   */\n  var registerFutureActiveCampaigns = function() {\n    window.optimizely = window.optimizely || [];\n    window.optimizely.push({\n      type: 'addListener',\n      filter: {\n        type: 'lifecycle',\n        name: 'campaignDecided'\n      },\n      handler: function(event) {\n        var id = event.data.campaign.id;\n        newActiveCampaign(id);\n      }\n    });\n  };\n  \n  /**\n   * If this code is running after Optimizely on the page, there might already be\n   * some campaigns active. This function makes sure all those campaigns are\n   * handled.\n   */\n  var registerCurrentlyActiveCampaigns = function(){\n    var state = window['optimizely'] && window['optimizely'].get && window['optimizely'].get('state');\n    if (state) {\n      var activeCampaigns = state.getCampaignStates({\n        isActive: true\n      });\n      for (var id in activeCampaigns) {\n        newActiveCampaign(id);\n      }\n    }\n  };\n  \n  registerCurrentlyActiveCampaigns();\n  registerFutureActiveCampaigns();\n};\n\n/**\n* A wrapper around the logic for the new Optimizely integration.\n* @param {Function} referrerOverride - This function is called if the effective referrer value differs from\n*   the current document.referrer value. The only argument provided is the effective referrer value.\n* @param {Function} sendCampaignData - This function is called for every running campaign on the page.\n*   The function is called with all the relevant ids and names.\n*/\nvar initOptimizelyIntegration = function(referrerOverride, sendCampaignData) {\n  initNewOptimizelyIntegration(referrerOverride, sendCampaignData);\n}\n\ninitOptimizelyIntegration(referrerOverride, sendCampaignData);\n</script>"
                     },
                     {
                         "type": "BOOLEAN",
@@ -104,11 +107,14 @@
                         "value": "false"
                     }
                 ],
-                "fingerprint": "1552567115650",
+                "fingerprint": "1577966539973",
                 "firingTriggerId": [
                     "2147479553"
                 ],
-                "tagFiringOption": "ONCE_PER_EVENT"
+                "tagFiringOption": "ONCE_PER_EVENT",
+                "monitoringMetadata": {
+                    "type": "MAP"
+                }
             },
             {
                 "accountId": "925787450",
@@ -160,20 +166,23 @@
                     },
                     {
                         "type": "TEMPLATE",
-                        "key": "gaSettings",
-                        "value": "{{Flexbox Playground}}"
+                        "key": "eventAction",
+                        "value": "Redirect Referrer Override"
                     },
                     {
                         "type": "TEMPLATE",
-                        "key": "eventAction",
-                        "value": "Redirect Referrer Override"
+                        "key": "trackingId",
+                        "value": "UA-000000-0"
                     }
                 ],
-                "fingerprint": "1552392350072",
+                "fingerprint": "1577966396410",
                 "firingTriggerId": [
                     "9"
                 ],
-                "tagFiringOption": "ONCE_PER_EVENT"
+                "tagFiringOption": "ONCE_PER_EVENT",
+                "monitoringMetadata": {
+                    "type": "MAP"
+                }
             }
         ],
         "trigger": [
@@ -337,7 +346,7 @@
                 "name": "Event"
             }
         ],
-        "fingerprint": "0",
-        "tagManagerUrl": "https://tagmanager.google.com/#/versions/accounts/925787450/containers/6045411/versions/0?apiLink=version"
+        "fingerprint": "1577966632261",
+        "tagManagerUrl": "https://tagmanager.google.com/#/versions/accounts/925787450/containers/6045411/versions/5?apiLink=version"
     }
 }
