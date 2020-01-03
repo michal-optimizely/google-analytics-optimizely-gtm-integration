@@ -38,6 +38,7 @@ Variables:
 - **Version 2.1 (latest)**
   - Removed automatic logging (no impact on the functionality of the integration).
   - Removed custom variable unrelated to this integration from the exported GTM container.
+  - Expanded readme file instructions.
 - **Version 2.0:**
   - The integration code was simplified by using the [getDecisionString method](https://developers.optimizely.com/x/solutions/javascript/reference/index.html#function_getdecisionstring) for collecting the integration string instead of the set of multiple older APIs and concatonating the result together manualy. This also means this integration now adheres to the naming conventions for third-party integrations as outlined [here].(https://help.optimizely.com/Integrate_Other_Platforms/Naming_conventions_for_third-party_integrations).  
   - Implemented [this suggestion](https://gist.github.com/Bigspencey/67931877400e121554c22a979109a496#gistcomment-2679566) to avoid the risk of throwing an error on pages without Optimizely snippet implemented.
